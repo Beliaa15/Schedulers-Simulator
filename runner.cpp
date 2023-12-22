@@ -13,7 +13,6 @@ void choose_scheduler(vector<Process> processes, int n)
         break;
     case 2:
         SJF_Scheduler(processes, n);
-        printGanttChart(processes);
         break;
     case 3:
         // SRTF_Scheduler(processes, n);
@@ -64,56 +63,59 @@ int main()
     }
 
     fclose(fp);
-
-    // main window
-    printf("\t\t\033[1;32mOur Humble Simulation\033[0m\nEnter:\t 1-Create a new process \n\t 2-Start simulation with current dataset\n");
-    getIntegerOnly(&choose);
     i = 0;
-    if (choose == 1)
+    num_processes = Dataset_processes_num;
+    // main window
+    while (true)
     {
-        printf("-------------------------------------------------------\n");
-        printf("Enter the number of processes:");
-        getIntegerOnly(&user_processes_num);
+        printf("\t\t\033[1;32mOur Humble Simulation\033[0m\nEnter:\t 1-Create a new process \n\t 2-Start simulation with current dataset\n");
+        getIntegerOnly(&choose);
 
-        while (i < user_processes_num)
+        if (choose == 1)
         {
-            processes[Dataset_processes_num + i].process_id = Dataset_processes_num + i + 1;
-            strcpy(processes[Dataset_processes_num + i].process_status, "ready");
-
-            printf("Enter process %d Name: ", i + 1);
-            cin >> processes[Dataset_processes_num + i].process_name;
-
-            printf("Enter process %d arrival time: ", i + 1);
-            getIntegerOnly(&processes[Dataset_processes_num + i].arrival_time);
-
-            printf("Enter process %d CPU time: ", i + 1);
-            getIntegerOnly(&processes[Dataset_processes_num + i].CPU_time);
-
-            printf("Enter process %d IO time: ", i + 1);
-            getIntegerOnly(&processes[Dataset_processes_num + i].IO_time);
-
-            if (processes[Dataset_processes_num + i].IO_time != 0)
+            printf("-------------------------------------------------------\n");
+            printf("Enter the number of processes:");
+            getIntegerOnly(&user_processes_num);
+            num_processes += user_processes_num;
+            while (user_processes_num--)
             {
-                printf("Enter process %d IO start time: ", i + 1);
-                getIntegerOnly(&processes[Dataset_processes_num + i].IO_start_time);
+                processes[Dataset_processes_num + i].process_id = Dataset_processes_num + i + 1;
+                strcpy(processes[Dataset_processes_num + i].process_status, "ready");
+
+                printf("Enter process %d Name: ", i + 1);
+                cin >> processes[Dataset_processes_num + i].process_name;
+
+                printf("Enter process %d arrival time: ", i + 1);
+                getIntegerOnly(&processes[Dataset_processes_num + i].arrival_time);
+
+                printf("Enter process %d CPU time: ", i + 1);
+                getIntegerOnly(&processes[Dataset_processes_num + i].CPU_time);
+
+                printf("Enter process %d IO time: ", i + 1);
+                getIntegerOnly(&processes[Dataset_processes_num + i].IO_time);
+
+                if (processes[Dataset_processes_num + i].IO_time != 0)
+                {
+                    printf("Enter process %d IO start time: ", i + 1);
+                    getIntegerOnly(&processes[Dataset_processes_num + i].IO_start_time);
+                }
+
+                printf("Enter process %d specifier: ", i + 1);
+                cin >> processes[Dataset_processes_num + i].pro_specifier;
+
+                i++;
             }
 
-            printf("Enter process %d specifier: ", i + 1);
-            cin >> processes[Dataset_processes_num + i].pro_specifier;
-
-            i++;
+            choose_scheduler(processes, num_processes);
         }
-        num_processes = Dataset_processes_num + user_processes_num;
-        choose_scheduler(processes, Dataset_processes_num + user_processes_num);
-    }
-    else if (choose == 2)
-    {
-        num_processes = Dataset_processes_num + user_processes_num;
-        choose_scheduler(processes, Dataset_processes_num + user_processes_num);
-    }
-    else
-    {
-        printf("Invalid number!.\n Please enter a valid number.\n");
+        else if (choose == 2)
+        {
+            choose_scheduler(processes, num_processes);
+        }
+        else
+        {
+            printf("Invalid number!.\n Please enter a valid number.\n");
+        }
     }
 
     return 0;
