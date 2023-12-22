@@ -1,56 +1,57 @@
 #include "src/header.h"
 
-int total_time = 0;
-
-bool compareArrivalTime(Process &a, Process &b)
+bool compareCPUtime(Process &a, Process &b)
 {
-    if (a.arrival_time == b.arrival_time)
-    {
-        return a.burst_time < b.burst_time;
-    }
-    else
-    {
-        return a.arrival_time < b.arrival_time;
-    }
+    // don't foreget to check for the late arrival time first
+    return a.CPU_time > b.CPU_time;
 }
 
-void printGanttChart(vector<Process> processes)
+void SJF_printResults(vector<Process> processes, int n)
 {
-    vector<char> timeline(total_time, 'i');
-
-    int current_time = 0;
-    for (auto &p : processes)
+    int spaces = 0;
+    printf("Process Name\tTurn around\tResponse time\tGantt chart\n");
+    for (int i = n - 1; i >= 0; i--)
     {
-        for (int i = 0; i < p.burst_time; ++i)
+        printf("%s\t\t|", processes[i].process_name);
+        printf("\t%d\t|", processes[i].turnAround_time);
+        printf("\t%d\t|", processes[i].response_time);
+
+        for (int j = 0; j < processes[i].CPU_time; j++)
         {
-            timeline[current_time] = p.process_id;
-            ++current_time;
+            if (i == n - 1)
+            {
+                spaces += processes[i].CPU_time;
+                break;
+            }
+            else
+            {
+                for (int i = 0; i < spaces; i++)
+                {
+                    cout << " ";
+                }
+                spaces += processes[i].CPU_time;
+                break;
+            }
         }
-    }
 
-    for (int i = 0; i < total_time; ++i)
-        cout << i << " ";
-    cout << endl;
-
-    for (auto &c : timeline)
-    {
-        cout << c << " ";
+        // Print Gantt chart for CPU execution time only
+        for (int j = 0; j < processes[i].CPU_time; j++)
+        {
+            cout << processes[i].pro_specifier;
+        }
+        printf("\n");
     }
-    cout << endl;
+    printf("\n\n");
 }
 
 void SJF_Scheduler(vector<Process> processes, int n)
 {
-    sort(processes.begin(), processes.end(), compareArrivalTime);
-    for (auto d : processes)
-    {
-        total_time += d.burst_time;
-        for (int i = 0; i < d.burst_time; ++i)
-        {
-            cout << d.process_id << " ";
-        }
-    }
+    sort(processes.begin(), processes.begin() + n, compareCPUtime);
+    double avrage_turn = calculateTurnaroundTime(processes, n, SJF);
+    double avrage_res = calculateResponseTime(processes, n, SJF);
 
-    cout << "\n\nGantt chart representation:\n";
-    printGanttChart(processes);
+    SJF_printResults(processes, n);
+
+    printf("average of Turnaround time=%0.2f\n", avrage_turn);
+    printf("average of Response time=%0.2f\n", avrage_res);
 }
