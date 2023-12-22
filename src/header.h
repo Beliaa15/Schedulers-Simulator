@@ -13,7 +13,7 @@ using namespace std;
 
 #define SJF 1
 #define FCFS 2
-#define SRTF 3
+#define SRTCF 3
 #define MLFQ 4
 #define RR 5
 
@@ -51,6 +51,6 @@ void choose_scheduler(vector<Process> processes, int n);
 void getIntegerOnly(int *ptr);
 
 void SJF_Scheduler(vector<Process> processes, int n);
-bool compareArrivalTime(Process &a, Process &b);
-void printGanttChart(vector<Process> processes);
+void SJF_printResults(vector<Process> processes, int n);
+bool compareCPUtime(Process &a, Process &b);
 #endif
