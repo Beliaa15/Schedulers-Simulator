@@ -51,10 +51,10 @@ void choose_scheduler(deque<Process> processes, int numCores);
 void getIntegerOnly(int *ptr);
 
 void SJF_Scheduler(deque<Process> processes, int numCores);
-void SJF_printResults(deque<Process> processes, int n);
-bool compareArrival(Process &a, Process &b);
-bool compareExecutionTime(Process &a, Process &b);
-
 void STCF_Scheduler(deque<Process> processes, int num_cores);
+bool compareArrival(Process &a, Process &b);
+void printTableHeader(int numCores);
+void printTableRow(int currentTime, vector<Process> &cores);
+// bool compareExecutionTime(Process &a, Process &b);
 
 #endif
