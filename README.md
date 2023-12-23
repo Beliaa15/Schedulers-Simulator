@@ -1,4 +1,4 @@
-To compile header file:
+To compile header file (go to src folder first):
 ```bash
 g++ header.h -o header.exe
 ```
