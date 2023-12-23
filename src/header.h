@@ -50,6 +50,7 @@ double calculateTurnaroundTime(deque<Process> processes, int scheduler);
 void choose_scheduler(deque<Process> processes, int numCores);
 void getIntegerOnly(int *ptr);
 
+void FCFS_Scheduler(deque<Process> processes, int numCores);
 void SJF_Scheduler(deque<Process> processes, int numCores);
 void STCF_Scheduler(deque<Process> processes, int num_cores);
 bool compareArrival(Process &a, Process &b);
