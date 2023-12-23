@@ -7,6 +7,8 @@ bool FCFScompareArrivalTime(const Process& p1, const Process& p2) {
 void FCFS_Scheduler(deque<Process> processes, int numCores){
     int currentTime = 0;
     int completedProcesses = 0;
+    double totalTurnTime = 0;
+    double totalResponseTime = 0;
     sort(processes.begin(), processes.end(), FCFScompareArrivalTime);
     vector<Process> cores(numCores, {-1, 0, 0, 0, 0, 0});
     queue<Process> readyQueue;
@@ -19,6 +21,10 @@ void FCFS_Scheduler(deque<Process> processes, int numCores){
             if (process.arrival_time == currentTime)
             {
                 readyQueue.push(process);
+                process.first_runtime = currentTime;
+                process.response_time = process.first_runtime - process.arrival_time;
+                //cout << "Process " << process.process_id << " Arrival time: " << process.arrival_time << " First runtime: " << process.first_runtime << " Response Time: " << process.response_time << endl;
+                totalResponseTime += process.response_time;
             }
         }
 
@@ -33,7 +39,15 @@ void FCFS_Scheduler(deque<Process> processes, int numCores){
                 cores[i].remaining_time--;
                 if (cores[i].remaining_time < 0)
                 {
-                    cores[i].end_time = currentTime;
+                    for(auto process : processes){
+                        if(process.process_id == cores[i].process_id){
+                            process.end_time = currentTime;
+                            process.turnAround_time = process.end_time - process.arrival_time;
+                            //cout << "Process " << process.process_id << " Arrival time: " << process.arrival_time << " End time: " << process.end_time << " Turnaround Time: " << process.turnaround_time << endl;
+                            totalTurnTime += process.turnAround_time;
+                            break;
+                        }
+                    }
                     // cout << "\t\t\tCore " << i + 1 << " completed Process " << cores[i].process_id << " at time " << currentTime << endl;
                     cores[i] = {-1, 0, 0, 0, 0, 0};
                     completedProcesses++;
@@ -43,6 +57,7 @@ void FCFS_Scheduler(deque<Process> processes, int numCores){
         printTableRow(currentTime, cores);
         currentTime++;
     }    
-
-    printTableRow(currentTime, cores);
+    cout << "Average Turnaround Time: " << totalTurnTime / processes.size() << endl;
+    cout << "Average Response Time: " << totalResponseTime / processes.size() << endl;
+    //printTableRow(currentTime, cores);
 }
