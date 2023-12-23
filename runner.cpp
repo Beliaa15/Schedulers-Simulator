@@ -15,7 +15,7 @@ void choose_scheduler(deque<Process> processes, int numCores)
         SJF_Scheduler(processes, 4);
         break;
     case 3:
-        // SRTF_Scheduler(processes, n);
+        STCF_Scheduler(processes, 4);
         break;
     case 4:
         // MLFQ_Scheduler(processes, n);
@@ -24,7 +24,7 @@ void choose_scheduler(deque<Process> processes, int numCores)
         // RR_Scheduler(processes, n);
         break;
     default:
-        printf("Invalid number!.");
+        printf("Invalid number!.\n");
         break;
     }
 }
@@ -34,7 +34,7 @@ int main()
     int Dataset_processes_num = 0, user_processes_num = 0, choose;
     char c;
     system("clear");
-    FILE *fp = fopen("input.txt", "r");
+    FILE *fp = fopen("input1.txt", "r");
 
     if (fp == NULL)
     {

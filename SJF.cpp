@@ -12,85 +12,92 @@ bool compareExecutionTime(Process &a, Process &b)
 
 void SJF_printResults(deque<Process> processes, int n)
 {
-    int maxTurnaround = 0;
-    int totalTurnaround = 0;
-    int totalResponse = 0;
-
-    // cout << "Process Name\tTurnaround Time\tResponse Time\tGantt Chart\n";
+    int spaces = 0;
+    printf("Process Name\tTurn around\tResponse time\tGantt chart\n");
     for (int i = 0; i < n; i++)
     {
-        totalTurnaround += processes[i].turnAround_time;
-        totalResponse += processes[i].response_time;
+        printf("%s\t\t|", processes[i].process_name);
+        printf("\t%d\t|", processes[i].turnAround_time);
+        printf("\t%d\t|", processes[i].response_time);
 
-        if (processes[i].turnAround_time > maxTurnaround)
+        for (int j = 0; j < processes[i].CPU_time; j++)
         {
-            maxTurnaround = processes[i].turnAround_time;
+            if (i == 0)
+            {
+                spaces += processes[i].CPU_time;
+                break;
+            }
+            else
+            {
+                for (int i = 0; i < spaces; i++)
+                {
+                    cout << " ";
+                }
+                spaces += processes[i].CPU_time;
+                break;
+            }
         }
 
-        // cout << processes[i].process_name << "\t\t" << processes[i].turnAround_time << "\t\t" << processes[i].response_time << "\t\t";
-
+        // Print Gantt chart for CPU execution time only
         for (int j = 0; j < processes[i].CPU_time; j++)
         {
             cout << processes[i].process_name;
         }
-        cout << endl;
+        printf("\n");
     }
-
-    double averageTurnaround = static_cast<double>(totalTurnaround) / n;
-    double averageResponse = static_cast<double>(totalResponse) / n;
-
-    cout << "\nAverage Turnaround Time: " << averageTurnaround << endl;
-    cout << "Average Response Time: " << averageResponse << endl;
-    cout << "Maximum Turnaround Time: " << maxTurnaround << endl;
-    cout << endl;
+    printf("\n\n");
 }
 
 void SJF_Scheduler(deque<Process> processes, int numCores)
 {
     sort(processes.begin(), processes.end(), compareArrival);
 
+    // simulate the 4 cores
+    vector<int> cores(numCores, -1);
+
     int currentTime = 0;
     int completedProcesses = 0;
-    deque<Process> readyQueue;
 
     while (completedProcesses < processes.size())
     {
-        // Move processes to ready queue when they arrive
-        while (!processes.empty() && processes.front().arrival_time <= currentTime)
+        // Select processes that have arrived but not yet completed
+        vector<Process> readyProcesses;
+        for (Process &p : processes)
         {
-            readyQueue.push_back(processes.front());
-            processes.pop_front();
+            if (p.arrival_time <= currentTime)
+            {
+                readyProcesses.push_back(p);
+            }
         }
 
-        // Sort ready queue by execution time
-        sort(readyQueue.begin(), readyQueue.end(), compareExecutionTime);
-
-        // Simulate CPU execution
-        for (int i = 0; i < min(numCores, int(readyQueue.size())); i++)
+        // If there are processes ready to be scheduled
+        if (!readyProcesses.empty())
         {
-            if (!readyQueue.empty())
+            // Sort by remaining CPU time (SJF)
+            sort(readyProcesses.begin(), readyProcesses.end(), compareExecutionTime);
+
+            // Assign processes to cores
+            for (int i = 0; i < min(numCores, (int)readyProcesses.size()); i++)
             {
-                Process &currentProcess = readyQueue.front();
-
-                // Update turnaround and response times
-                currentProcess.turnAround_time = currentTime + currentProcess.CPU_time - currentProcess.arrival_time;
-                currentProcess.response_time = currentTime - currentProcess.arrival_time;
-
-                // Update current time
-                currentTime++;
-
-                // Print Gantt chart for CPU execution time
-                for (int j = 0; j < currentProcess.CPU_time; j++)
-                {
-                    cout << currentProcess.process_name;
-                }
-
-                // Remove the completed process from the ready queue
-                readyQueue.pop_front();
+                cores[i] = readyProcesses[i].process_id;
+                readyProcesses[i].response_time = currentTime;
+                readyProcesses[i].turnAround_time = currentTime + readyProcesses[i].CPU_time;
                 completedProcesses++;
+                currentTime++;
             }
+        }
+        else
+        {
+            // If no processes are ready, increment time
+            currentTime++;
         }
     }
 
+    double avrage_turn = calculateTurnaroundTime(processes, SJF);
+    double avrage_res = calculateResponseTime(processes, SJF);
+
     SJF_printResults(processes, processes.size());
+
+    printf("average of Turnaround time = %0.2f\n", avrage_turn);
+    printf("average of Response time = %0.2f\n", avrage_res);
 }

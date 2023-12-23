@@ -55,4 +55,6 @@ void SJF_printResults(deque<Process> processes, int n);
 bool compareArrival(Process &a, Process &b);
 bool compareExecutionTime(Process &a, Process &b);
 
+void STCF_Scheduler(deque<Process> processes, int num_cores);
+
 #endif

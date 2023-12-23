@@ -1,0 +1,6 @@
+Process ID	|  Process name	|  Arrival time	|  CPU time		|  IO time		|  IO start time	|  Pro specifier																																			
+001		|	A		|	0		|	10	  |	0		|	0		|	_
+002		|	B		|	1		|	10		|	0		|	2		|	-
+003		|	C		|	2		|	10		|	0		|	3		|	*
+004		|	D		|	3		|	10		|	0		|	1		|	$
+005		|	E		|	4		|	3	 	  |	0		|	1		|	#
