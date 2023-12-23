@@ -4,7 +4,7 @@ void choose_scheduler(deque<Process> processes, int numCores)
 {
     int sch_choose;
     printf("-------------------------------------------------------\n");
-    printf("\t\t\033[1;34mSelect Scheduler\033[0m\n1-First Come First Served\n2-Shortest Job First\n3-Shortest Remaining Time First\n4-Multi-Level Feedback Queue \n5-Round Robin\n");
+    printf("\t\t\033[1;34mSelect Scheduler\033[0m\n1-First Come First Served\n2-Shortest Job First\n3-Shortest To Complete First\n4-Multi-Level Feedback Queue \n5-Round Robin\n6-Stride\n7-Priority");
     getIntegerOnly(&sch_choose);
     switch (sch_choose)
     {
