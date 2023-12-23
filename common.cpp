@@ -69,3 +69,30 @@ void getIntegerOnly(int *ptr)
             break;
     }
 }
+
+void printTableHeader(int numCores)
+{
+    cout << setw(10) << "Time";
+    for (int i = 1; i <= numCores; ++i)
+    {
+        cout << setw(15) << "Core " << i;
+    }
+    cout << endl;
+}
+
+void printTableRow(int currentTime, vector<Process> &cores)
+{
+    cout << setw(10) << currentTime;
+    for (const Process &core : cores)
+    {
+        if (core.process_id != -1)
+        {
+            cout << setw(11) << "P" << core.process_id << "(" << core.remaining_time << ")";
+        }
+        else
+        {
+            cout << setw(15) << "Idle";
+        }
+    }
+    cout << endl;
+}

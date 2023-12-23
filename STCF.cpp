@@ -1,34 +1,13 @@
 #include "src/header.h"
+
 bool compareRemainingTime(const Process &p1, const Process &p2)
 {
     return p1.remaining_time > p2.remaining_time;
 }
 
-void printTableHeader(int numCores)
+bool compareArrival(Process &a, Process &b)
 {
-    cout << setw(10) << "Time";
-    for (int i = 1; i <= numCores; ++i)
-    {
-        cout << setw(15) << "Core " << i;
-    }
-    cout << endl;
-}
-
-void printTableRow(int currentTime, vector<Process> &cores)
-{
-    cout << setw(10) << currentTime;
-    for (const Process &core : cores)
-    {
-        if (core.process_id != -1)
-        {
-            cout << setw(11) << "P" << core.process_id << "(" << core.remaining_time << ")";
-        }
-        else
-        {
-            cout << setw(15) << "Idle";
-        }
-    }
-    cout << endl;
+    return a.arrival_time < b.arrival_time;
 }
 
 void STCF_Scheduler(deque<Process> processes, int numCores)
@@ -51,8 +30,6 @@ void STCF_Scheduler(deque<Process> processes, int numCores)
             }
         }
 
-        printTableRow(currentTime, cores);
-
         for (int i = 0; i < numCores; i++)
         {
             if (cores[i].process_id == -1 && !readyQueue.empty())
@@ -69,7 +46,7 @@ void STCF_Scheduler(deque<Process> processes, int numCores)
             if (cores[i].process_id != -1)
             {
                 cores[i].remaining_time--;
-                if (cores[i].remaining_time == 0)
+                if (cores[i].remaining_time < 0)
                 {
                     cores[i].end_time = currentTime;
                     // cout << "\t\t\tCore " << i + 1 << " completed Process " << cores[i].process_id << " at time " << currentTime << endl;
@@ -78,6 +55,7 @@ void STCF_Scheduler(deque<Process> processes, int numCores)
                 }
             }
         }
+        printTableRow(currentTime, cores);
         currentTime++;
     }
     printTableRow(currentTime, cores);
