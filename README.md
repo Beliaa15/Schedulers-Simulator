@@ -1,6 +1,6 @@
 To Compile:
 ```bash 
-gcc *.cpp -o output
+g++ *.cpp -o output
 ```
 
 To Run:
