@@ -101,6 +101,9 @@ int main()
                 printf("Enter process %d specifier: ", i + 1);
                 cin >> temp.pro_specifier;
 
+                temp.execution_time = temp.CPU_time - temp.IO_time;
+                temp.remaining_time = temp.CPU_time;
+
                 i++;
                 processes.push_back(temp);
             }
