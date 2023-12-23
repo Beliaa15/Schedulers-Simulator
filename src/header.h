@@ -45,12 +45,14 @@ typedef struct
     bool holder;
 } Process;
 
-double calculateResponseTime(vector<Process> processes, int n, int scheduler);
-double calculateTurnaroundTime(vector<Process> processes, int n, int scheduler);
-void choose_scheduler(vector<Process> processes, int n);
+double calculateResponseTime(deque<Process> processes, int scheduler);
+double calculateTurnaroundTime(deque<Process> processes, int scheduler);
+void choose_scheduler(deque<Process> processes, int numCores);
 void getIntegerOnly(int *ptr);
 
-void SJF_Scheduler(vector<Process> processes, int n);
-void SJF_printResults(vector<Process> processes, int n);
-bool compareCPUtime(Process &a, Process &b);
+void SJF_Scheduler(deque<Process> processes, int numCores);
+void SJF_printResults(deque<Process> processes, int n);
+bool compareArrival(Process &a, Process &b);
+bool compareExecutionTime(Process &a, Process &b);
+
 #endif

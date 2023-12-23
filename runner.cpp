@@ -1,6 +1,6 @@
 #include "src/header.h"
 
-void choose_scheduler(vector<Process> processes, int n)
+void choose_scheduler(deque<Process> processes, int numCores)
 {
     int sch_choose;
     printf("-------------------------------------------------------\n");
@@ -12,7 +12,7 @@ void choose_scheduler(vector<Process> processes, int n)
         // FCFS_Scheduler(processes, n);
         break;
     case 2:
-        SJF_Scheduler(processes, n);
+        SJF_Scheduler(processes, 4);
         break;
     case 3:
         // SRTF_Scheduler(processes, n);
@@ -33,7 +33,6 @@ int main()
 {
     int Dataset_processes_num = 0, user_processes_num = 0, choose;
     char c;
-    int num_processes;
     system("clear");
     FILE *fp = fopen("input.txt", "r");
 
@@ -47,24 +46,23 @@ int main()
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, fp);
     fgets(line, MAX_LINE_LENGTH, fp);
-    // Create an array of Process structs to hold the data
-    vector<Process> processes(MAX_LINE_LENGTH);
 
-    // Initialize the index for the processes array
-    int i = 0;
+    // Create an array of Process structs to hold the data
+    deque<Process> processes;
 
     while (fgets(line, MAX_LINE_LENGTH, fp) != NULL)
     {
-        sscanf(line, "%d | %s | %d | %d | %d | %d | %s", &processes[i].process_id, processes[i].process_name, &processes[i].arrival_time, &processes[i].CPU_time, &processes[i].IO_time, &processes[i].IO_start_time, processes[i].pro_specifier);
-        processes[i].execution_time = processes[i].CPU_time - processes[i].IO_time;
-        processes[i].remaining_time = processes[i].CPU_time;
-        i++;
+        Process temp;
+        sscanf(line, "%d | %s | %d | %d | %d | %d | %s", &temp.process_id, temp.process_name, &temp.arrival_time, &temp.CPU_time, &temp.IO_time, &temp.IO_start_time, temp.pro_specifier);
+        temp.execution_time = temp.CPU_time - temp.IO_time;
+        temp.remaining_time = temp.CPU_time;
+        processes.push_back(temp);
         Dataset_processes_num++;
     }
 
     fclose(fp);
-    i = 0;
-    num_processes = Dataset_processes_num;
+    int i = 0;
+
     // main window
     while (true)
     {
@@ -76,41 +74,42 @@ int main()
             printf("-------------------------------------------------------\n");
             printf("Enter the number of processes:");
             getIntegerOnly(&user_processes_num);
-            num_processes += user_processes_num;
             while (user_processes_num--)
             {
-                processes[Dataset_processes_num + i].process_id = Dataset_processes_num + i + 1;
-                strcpy(processes[Dataset_processes_num + i].process_status, "ready");
+                Process temp;
+                temp.process_id = Dataset_processes_num + i + 1;
+                strcpy(temp.process_status, "ready");
 
                 printf("Enter process %d Name: ", i + 1);
-                cin >> processes[Dataset_processes_num + i].process_name;
+                cin >> temp.process_name;
 
                 printf("Enter process %d arrival time: ", i + 1);
-                getIntegerOnly(&processes[Dataset_processes_num + i].arrival_time);
+                getIntegerOnly(&temp.arrival_time);
 
                 printf("Enter process %d CPU time: ", i + 1);
-                getIntegerOnly(&processes[Dataset_processes_num + i].CPU_time);
+                getIntegerOnly(&temp.CPU_time);
 
                 printf("Enter process %d IO time: ", i + 1);
-                getIntegerOnly(&processes[Dataset_processes_num + i].IO_time);
+                getIntegerOnly(&temp.IO_time);
 
-                if (processes[Dataset_processes_num + i].IO_time != 0)
+                if (temp.IO_time != 0)
                 {
                     printf("Enter process %d IO start time: ", i + 1);
-                    getIntegerOnly(&processes[Dataset_processes_num + i].IO_start_time);
+                    getIntegerOnly(&temp.IO_start_time);
                 }
 
                 printf("Enter process %d specifier: ", i + 1);
-                cin >> processes[Dataset_processes_num + i].pro_specifier;
+                cin >> temp.pro_specifier;
 
                 i++;
+                processes.push_back(temp);
             }
 
-            choose_scheduler(processes, num_processes);
+            choose_scheduler(processes, 4);
         }
         else if (choose == 2)
         {
-            choose_scheduler(processes, num_processes);
+            choose_scheduler(processes, 4);
         }
         else
         {
