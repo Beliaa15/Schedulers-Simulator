@@ -9,7 +9,7 @@ void choose_scheduler(deque<Process> processes, int numCores)
     switch (sch_choose)
     {
     case 1:
-        FCFS_Scheduler(processes, n);
+        FCFS_Scheduler(processes, 4);
         break;
     case 2:
         SJF_Scheduler(processes, 4);
@@ -22,6 +22,12 @@ void choose_scheduler(deque<Process> processes, int numCores)
         break;
     case 5:
         // RR_Scheduler(processes, n);
+        break;
+    case 6:
+        // Stride_Scheduler();
+        break;
+    case 7:
+        // Priority_Scheduler();
         break;
     default:
         printf("Invalid number!.\n");
