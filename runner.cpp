@@ -9,7 +9,7 @@ void choose_scheduler(deque<Process> processes, int numCores)
     switch (sch_choose)
     {
     case 1:
-        // FCFS_Scheduler(processes, n);
+        FCFS_Scheduler(processes, n);
         break;
     case 2:
         SJF_Scheduler(processes, 4);
