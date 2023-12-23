@@ -1,67 +1,62 @@
 #include "src/header.h"
-
-bool compareArrivalTime(const Process& p1, const Process& p2) {
-    return p1.arrival_time < p2.arrival_time;
-}
-
-bool compareRemainingTime(const Process& p1, const Process& p2) {
+bool compareRemainingTime(const Process &p1, const Process &p2)
+{
     return p1.remaining_time > p2.remaining_time;
 }
 
-void SJF_printResults(deque<Process> processes, int n)
+void printTableHeader(int numCores)
 {
-    int maxTurnaround = 0;
-    int totalTurnaround = 0;
-    int totalResponse = 0;
-
-    // cout << "Process Name\tTurnaround Time\tResponse Time\tGantt Chart\n";
-    for (int i = 0; i < n; i++)
+    cout << setw(10) << "Time";
+    for (int i = 1; i <= numCores; ++i)
     {
-        totalTurnaround += processes[i].turnAround_time;
-        totalResponse += processes[i].response_time;
-
-        if (processes[i].turnAround_time > maxTurnaround)
-        {
-            maxTurnaround = processes[i].turnAround_time;
-        }
-
-        // cout << processes[i].process_name << "\t\t" << processes[i].turnAround_time << "\t\t" << processes[i].response_time << "\t\t";
-
-        for (int j = 0; j < processes[i].CPU_time; j++)
-        {
-            cout << processes[i].process_name;
-        }
-        cout << endl;
+        cout << setw(15) << "Core " << i;
     }
-
-    double averageTurnaround = static_cast<double>(totalTurnaround) / n;
-    double averageResponse = static_cast<double>(totalResponse) / n;
-
-    cout << "\nAverage Turnaround Time: " << averageTurnaround << endl;
-    cout << "Average Response Time: " << averageResponse << endl;
-    cout << "Maximum Turnaround Time: " << maxTurnaround << endl;
     cout << endl;
 }
 
-void SJF_Scheduler(deque<Process> processes, int num_cores)
+void printTableRow(int currentTime, vector<Process> &cores)
+{
+    cout << setw(10) << currentTime;
+    for (const Process &core : cores)
+    {
+        if (core.process_id != -1)
+        {
+            cout << setw(11) << "P" << core.process_id << "(" << core.remaining_time << ")";
+        }
+        else
+        {
+            cout << setw(15) << "Idle";
+        }
+    }
+    cout << endl;
+}
+
+void STCF_Scheduler(deque<Process> processes, int numCores)
 {
     int currentTime = 0;
     int completedProcesses = 0;
-    sort(processes.begin(), processes.end(), compareArrivalTime);
+    sort(processes.begin(), processes.end(), compareArrival);
     priority_queue<Process, vector<Process>, decltype(&compareRemainingTime)> readyQueue(&compareRemainingTime);
-    vector<Process> cores(num_cores, {-1, 0, 0, 0, 0, 0});
+    vector<Process> cores(numCores, {-1, 0, 0, 0, 0, 0});
+
+    printTableHeader(numCores);
+
     while (completedProcesses < processes.size())
     {
-        for (Process process :  processes)
+        for (Process process : processes)
         {
             if (process.arrival_time == currentTime)
             {
                 readyQueue.push(process);
             }
         }
-        for (int i = 0; i < num_cores; i++)
+
+        printTableRow(currentTime, cores);
+
+        for (int i = 0; i < numCores; i++)
         {
-            if (cores[i].process_id == -1 && !readyQueue.empty()){
+            if (cores[i].process_id == -1 && !readyQueue.empty())
+            {
                 cores[i] = readyQueue.top();
                 readyQueue.pop();
             }
@@ -71,23 +66,19 @@ void SJF_Scheduler(deque<Process> processes, int num_cores)
                 cores[i] = readyQueue.top();
                 readyQueue.pop();
             }
-            if(cores[i].process_id != -1){
+            if (cores[i].process_id != -1)
+            {
                 cores[i].remaining_time--;
-                if (cores[i].remaining_time == 0){
+                if (cores[i].remaining_time == 0)
+                {
                     cores[i].end_time = currentTime;
-                    cout << "Core " << i + 1 << " completed Process " << cores[i].process_id << " at time " << currentTime << endl;
+                    // cout << "\t\t\tCore " << i + 1 << " completed Process " << cores[i].process_id << " at time " << currentTime << endl;
                     cores[i] = {-1, 0, 0, 0, 0, 0};
                     completedProcesses++;
                 }
             }
-            if(cores[i].process_id != -1){
-                cout << "Core " << i + 1 << " running Process " << cores[i].process_id << " at time " << currentTime << endl;
-            }
-            else{
-                cout << "Core " << i + 1 << " is idle at time " << currentTime << endl;
-            }
         }
         currentTime++;
     }
-    SJF_printResults(processes, processes.size());
+    printTableRow(currentTime, cores);
 }
