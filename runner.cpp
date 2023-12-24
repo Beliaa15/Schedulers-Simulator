@@ -21,7 +21,7 @@ void choose_scheduler(deque<Process> processes, int numCores)
         // MLFQ_Scheduler(processes, n);
         break;
     case 5:
-        // RR_Scheduler(processes, n);
+        RR_Scheduler(processes, 4, 1);
         break;
     case 6:
         // Stride_Scheduler();
@@ -40,7 +40,7 @@ int main()
     int Dataset_processes_num = 0, user_processes_num = 0, choose;
     char c;
     system("clear");
-    FILE *fp = fopen("input1.txt", "r");
+    FILE *fp = fopen("input.txt", "r");
 
     if (fp == NULL)
     {
