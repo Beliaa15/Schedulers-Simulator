@@ -40,7 +40,6 @@ typedef struct
     char pro_specifier[MAX_LINE_LENGTH];
     int end_time;
     int time_slice;
-    int turnaround_time;
     bool completed;
     bool holder;
 } Process;
@@ -53,9 +52,11 @@ void getIntegerOnly(int *ptr);
 void FCFS_Scheduler(deque<Process> processes, int numCores);
 void SJF_Scheduler(deque<Process> processes, int numCores);
 void STCF_Scheduler(deque<Process> processes, int num_cores);
+void RR_Scheduler(deque<Process> processes, int numCores, int quantum);
 bool compareArrival(Process &a, Process &b);
 void printTableHeader(int numCores);
 void printTableRow(int currentTime, vector<Process> &cores);
+
 // bool compareExecutionTime(Process &a, Process &b);
 
 #endif
