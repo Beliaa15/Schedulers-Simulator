@@ -18,7 +18,7 @@ void choose_scheduler(deque<Process> processes, int numCores)
         STCF_Scheduler(processes, 4);
         break;
     case 4:
-        // MLFQ_Scheduler(processes, n);
+        // MLFQ_Scheduler(processes, 4);
         break;
     case 5:
         RR_Scheduler(processes, 4, 1);

@@ -52,6 +52,7 @@ void getIntegerOnly(int *ptr);
 void FCFS_Scheduler(deque<Process> processes, int numCores);
 void SJF_Scheduler(deque<Process> processes, int numCores);
 void STCF_Scheduler(deque<Process> processes, int num_cores);
+void RR1_Scheduler(deque<Process> processes, int numCores, int quantum);
 void RR_Scheduler(deque<Process> processes, int numCores, int quantum);
 bool compareArrival(Process &a, Process &b);
 void printTableHeader(int numCores);
