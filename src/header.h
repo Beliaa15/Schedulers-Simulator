@@ -42,23 +42,6 @@ typedef struct
     int time_slice;
     bool completed;
     bool holder;
-
-    void setToZero()
-    {
-        process_id = -1;
-        arrival_time = 0;
-        CPU_time = 0;
-        execution_time = 0;
-        remaining_time = 0;
-        burst_time = 0;
-        remaining_time = 0;
-        IO_start_time = 0;
-        IO_time = 0;
-        first_runtime = 0;
-        waiting_time = 0;
-        turnAround_time = 0;
-        response_time = 0;
-    }
 } Process;
 
 double calculateResponseTime(deque<Process> processes, int scheduler);
@@ -69,7 +52,6 @@ void getIntegerOnly(int *ptr);
 void FCFS_Scheduler(deque<Process> processes, int numCores);
 void SJF_Scheduler(deque<Process> processes, int numCores);
 void STCF_Scheduler(deque<Process> processes, int num_cores);
-void RR1_Scheduler(deque<Process> processes, int numCores, int quantum);
 void RR_Scheduler(deque<Process> processes, int numCores, int quantum);
 bool compareArrival(Process &a, Process &b);
 void printTableHeader(int numCores);
