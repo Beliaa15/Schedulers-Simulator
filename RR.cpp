@@ -109,7 +109,7 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
             readyQueue.push(processes[processIdx]);
             processIdx++;
         }
-        printTableRow(currentTime, cores);
+        // printTableRow(currentTime, cores);
         //    execute
         for (int cr = 0; cr < numCores; cr++)
         {
