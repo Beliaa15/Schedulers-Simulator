@@ -42,6 +42,23 @@ typedef struct
     int time_slice;
     bool completed;
     bool holder;
+
+    void setToZero()
+    {
+        process_id = -1;
+        arrival_time = 0;
+        CPU_time = 0;
+        execution_time = 0;
+        remaining_time = 0;
+        burst_time = 0;
+        remaining_time = 0;
+        IO_start_time = 0;
+        IO_time = 0;
+        first_runtime = 0;
+        waiting_time = 0;
+        turnAround_time = 0;
+        response_time = 0;
+    }
 } Process;
 
 double calculateResponseTime(deque<Process> processes, int scheduler);

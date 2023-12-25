@@ -95,4 +95,5 @@ void printTableRow(int currentTime, vector<Process> &cores)
         }
     }
     cout << endl;
+    sleep(1);
 }
