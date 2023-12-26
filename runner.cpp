@@ -18,16 +18,16 @@ void choose_scheduler(deque<Process> processes, int numCores)
         STCF_Scheduler(processes, 4);
         break;
     case 4:
-        // MLFQ_Scheduler(processes, n);
+        // MLFQ_Scheduler(processes, 4);
         break;
     case 5:
-        RR_Scheduler(processes, 4, 1);
+        RR_Scheduler(processes, 4, 2);
         break;
     case 6:
         // Stride_Scheduler();
         break;
     case 7:
-        // Priority_Scheduler();
+        Priority_Scheduler(processes, 4);
         break;
     default:
         printf("Invalid number!.\n");
@@ -40,7 +40,7 @@ int main()
     int Dataset_processes_num = 0, user_processes_num = 0, choose;
     char c;
     system("clear");
-    FILE *fp = fopen("input.txt", "r");
+    FILE *fp = fopen("input2.txt", "r");
 
     if (fp == NULL)
     {
@@ -59,7 +59,7 @@ int main()
     while (fgets(line, MAX_LINE_LENGTH, fp) != NULL)
     {
         Process temp;
-        sscanf(line, "%d | %s | %d | %d | %d | %d | %s", &temp.process_id, temp.process_name, &temp.arrival_time, &temp.CPU_time, &temp.IO_time, &temp.IO_start_time, temp.pro_specifier);
+        sscanf(line, "%d | %s | %d | %d | %d | %d | %s | %d", &temp.process_id, temp.process_name, &temp.arrival_time, &temp.CPU_time, &temp.IO_time, &temp.IO_start_time, temp.pro_specifier, &temp.priority);
         temp.execution_time = temp.CPU_time - temp.IO_time;
         temp.remaining_time = temp.CPU_time;
         processes.push_back(temp);
@@ -106,6 +106,9 @@ int main()
 
                 printf("Enter process %d specifier: ", i + 1);
                 cin >> temp.pro_specifier;
+
+                printf("Enter process %d Priority: ", i + 1);
+                getIntegerOnly(&temp.IO_time);
 
                 temp.execution_time = temp.CPU_time - temp.IO_time;
                 temp.remaining_time = temp.CPU_time;
