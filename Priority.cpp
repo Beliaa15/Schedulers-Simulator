@@ -2,92 +2,77 @@
 
 bool PrioritycompareArrivalTime(const Process &p1, const Process &p2)
 {
-    if(p1.arrival_time != p2.arrival_time) {
+    if (p1.arrival_time != p2.arrival_time)
+    {
         return p1.arrival_time < p2.arrival_time;
     }
-    
-    return p1.execution_time < p2.execution_time;
+
+    return p1.priority < p2.priority;
 }
 
-void Priority_Scheduler(deque<Process> processes, int numCores){
-    queue<Process> readyQueue;
-    vector<Process> IOQueue;
-    int currentTime = 0, completedProcesses = 0, processIdx = 0;
-    vector<Process> cores(numCores, {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-    for(int i = 0; i < processes.size(); i++){
-        processes[i].time_slice = 0;
-    }
+void Priority_Scheduler(deque<Process> processes, int numCores)
+{
+    int currentTime = 0;
+    int completedProcesses = 0;
+    double totalTurnTime = 0;
+    double totalResponseTime = 0;
     sort(processes.begin(), processes.end(), PrioritycompareArrivalTime);
+    vector<Process> cores(numCores, {-1, 0, 0, 0, 0, 0});
+    queue<Process> readyQueue;
     printTableHeader(numCores);
-    for (currentTime = 0; completedProcesses < processes.size(); currentTime++)
+
+    while (completedProcesses < processes.size())
     {
-        for (int coreIdx = 0; coreIdx < numCores; coreIdx++)
+        for (Process process : processes)
         {
-            if (cores[coreIdx].process_id == -1 && processIdx < processes.size())
+            if (process.arrival_time == currentTime)
             {
-                if (processes[processIdx].arrival_time <= currentTime)
+                readyQueue.push(process);
+                process.first_runtime = currentTime;
+                process.response_time = process.first_runtime - process.arrival_time;
+                totalResponseTime += process.response_time;
+            }
+        }
+
+        for (int i = 0; i < numCores; i++)
+        {
+            if (cores[i].process_id == -1 && !readyQueue.empty())
+            {
+                cores[i] = readyQueue.front();
+                readyQueue.pop();
+            }
+            if (cores[i].process_id != -1)
+            {
+                cores[i].remaining_time--;
+                if (cores[i].remaining_time < 0)
                 {
-                    cores[coreIdx] = processes[processIdx];
-                    processIdx++;
-                }
-            }
-        }
-
-        // Arrived processes
-        while (processIdx < processes.size() && processes[processIdx].arrival_time <= currentTime)
-        {
-            readyQueue.push(processes[processIdx]);
-            processIdx++;
-        }
-        printTableRow(currentTime, cores);
-
-        for (int cr = 0; cr < numCores; cr++)
-        {
-            if ((cores[cr].IO_start_time + cores[cr].arrival_time) == currentTime) // IO
-            {
-                IOQueue.push_back(cores[cr]);
-                cores[cr].setToZero();
-                if(!readyQueue.empty()){
-                    cores[cr] = readyQueue.front();
-                    readyQueue.pop();
-                }
-            }
-            if(cores[cr].process_id != -1){
-                if(cores[cr].priority > readyQueue.front().priority){
-                    readyQueue.push(cores[cr]);
-                    cores[cr] = readyQueue.front();
-                    readyQueue.pop();
-                }
-                else{
-                    cores[cr].remaining_time--;
-                    if(cores[cr].remaining_time <= 0){
-                        completedProcesses++;
-                        cores[cr].setToZero();
-                        if(!readyQueue.empty()){
-                            cores[cr] = readyQueue.front();
-                            readyQueue.pop();
+                    for (auto process : processes)
+                    {
+                        if (process.process_id == cores[i].process_id)
+                        {
+                            process.end_time = currentTime;
+                            process.turnAround_time = process.end_time - process.arrival_time;
+                            totalTurnTime += process.turnAround_time;
+                            break;
                         }
                     }
-                }
-            }
-            else{
-                if(!readyQueue.empty()){
-                    cores[cr] = readyQueue.front();
-                    readyQueue.pop();
-                }
-            }
-        }
 
-        for (int i = 0; i < IOQueue.size(); i++)
-        {
-            IOQueue[i].IO_time--;
-            if (IOQueue[i].IO_time == 0)
-            {
-                readyQueue.push(IOQueue[i]);
-                IOQueue.erase(IOQueue.begin() + i);
-                i--;
+                    if (!readyQueue.empty())
+                    {
+                        cores[i] = readyQueue.front();
+                        readyQueue.pop();
+                    }
+                    else
+                    {
+                        cores[i].setToZero();
+                    }
+                    completedProcesses++;
+                }
             }
         }
+        printTableRow(currentTime, cores);
+        currentTime++;
     }
-    printTableRow(currentTime, cores);
+    cout << "Average Turnaround Time: " << totalTurnTime / processes.size() << endl;
+    cout << "Average Response Time: " << totalResponseTime / processes.size() << endl;
 }
