@@ -87,7 +87,7 @@ void printTableRow(int currentTime, vector<Process> &cores)
     {
         if (core.process_id != -1)
         {
-            cout << setw(11) << "P" << core.process_id << "(" << core.remaining_time << ")";
+            cout << setw(15) << "P" << core.process_id;
         }
         else
         {
@@ -95,5 +95,5 @@ void printTableRow(int currentTime, vector<Process> &cores)
         }
     }
     cout << endl;
-    sleep(1);
+    //sleep(1);
 }

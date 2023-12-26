@@ -48,39 +48,38 @@ void MLFQ_Scheduler(deque<Process> processes, int numCores)
             {
                 cores[i].time_slice++;
                 cores[i].remaining_time--;
-            }
-
-            if (cores[i].remaining_time <= 0)
-            {
-                completedProcesses++;
-                cores[i].setToZero();
-                for (int j = 0; j < 5; j++)
+                if (cores[i].remaining_time <= 0)
                 {
-                    if (!readyQueues[j].empty())
+                    completedProcesses++;
+                    cores[i].setToZero();
+                    for (int j = 0; j < 5; j++)
                     {
-                        cores[i] = readyQueues[j].front();
-                        cores[i].crnt_queue = j;
-                        readyQueues[j].pop();
-                        break;
+                        if (!readyQueues[j].empty())
+                        {
+                            cores[i] = readyQueues[j].front();
+                            cores[i].crnt_queue = j;
+                            readyQueues[j].pop();
+                            break;
+                        }
                     }
                 }
-            }
-
-            if (cores[i].time_slice % (2 << (cores[i].crnt_queue + 1)) == 0)
-            {
-                // Demote process to a lower priority queue
-                if (cores[i].crnt_queue < 9)
-                    cores[i].crnt_queue++;
-                readyQueues[cores[i].crnt_queue].push(cores[i]);
-                cores[i].setToZero();
-                for (int j = 0; j < 5; j++)
+                else if (cores[i].time_slice % (2 << (cores[i].crnt_queue + 1)) == 0)
                 {
-                    if (!readyQueues[j].empty())
+                    // Demote process to a lower priority queue
+                    if (cores[i].crnt_queue < 4)
+                        cores[i].crnt_queue++;
+                    cores[i].time_slice = 0;
+                    readyQueues[cores[i].crnt_queue].push(cores[i]);
+                    cores[i].setToZero();
+                    for (int j = 0; j < 5; j++)
                     {
-                        cores[i] = readyQueues[j].front();
-                        cores[i].crnt_queue = j;
-                        readyQueues[j].pop();
-                        break;
+                        if (!readyQueues[j].empty())
+                        {
+                            cores[i] = readyQueues[j].front();
+                            cores[i].crnt_queue = j;
+                            readyQueues[j].pop();
+                            break;
+                        }
                     }
                 }
             }

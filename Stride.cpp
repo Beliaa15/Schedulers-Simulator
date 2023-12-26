@@ -1,10 +1,12 @@
 #include "src/header.h"
 
-bool StrideCompare(const Process& p1, const Process& p2) {
-    if(p1.arrival_time != p2.arrival_time) {
+bool StrideCompare(const Process &p1, const Process &p2)
+{
+    if (p1.arrival_time != p2.arrival_time)
+    {
         return p1.arrival_time < p2.arrival_time;
     }
-    
+
     return p1.pass < p2.pass;
 }
 
@@ -23,7 +25,8 @@ Process getMinumum(queue<Process> processes)
     return min;
 }
 
-void Stride_Scheduler(deque<Process> processes, int numCores){
+void Stride_Scheduler(deque<Process> processes, int numCores)
+{
     int currentTime = 0, completedProcesses = 0, processIdx = 0;
     vector<Process> cores(numCores, {-1, 0, 0, 0, 0, 0});
     vector<Process> IOQueue;
@@ -32,12 +35,9 @@ void Stride_Scheduler(deque<Process> processes, int numCores){
     {
         process.stride = 2000 / process.CPU_time;
         process.pass = 0;
+        process.holder = false;
     }
     sort(processes.begin(), processes.end(), StrideCompare);
-    for (Process process : processes)
-    {
-        cout << process.process_id << " " << process.pass << " " << process.stride << " " << process.arrival_time <<  " " << process.CPU_time <<endl;
-    }
 
     printTableHeader(numCores);
 
@@ -50,6 +50,9 @@ void Stride_Scheduler(deque<Process> processes, int numCores){
                 if (processes[processIdx].arrival_time <= currentTime)
                 {
                     cores[coreIdx] = processes[processIdx];
+                    processes[processIdx].first_runtime = currentTime;
+                    processes[processIdx].response_time = processes[processIdx].first_runtime - processes[processIdx].arrival_time;
+                    processes[processIdx].holder = true;
                     processIdx++;
                 }
             }
@@ -62,10 +65,6 @@ void Stride_Scheduler(deque<Process> processes, int numCores){
         printTableRow(currentTime, cores);
         for (int cr = 0; cr < numCores; cr++)
         {
-            Process min;
-            if(!readyQueue.empty()){
-                min = getMinumum(readyQueue);
-            }
             if ((cores[cr].IO_start_time + cores[cr].arrival_time) == currentTime) // IO
             {
                 IOQueue.push_back(cores[cr]);
@@ -73,32 +72,82 @@ void Stride_Scheduler(deque<Process> processes, int numCores){
                 if (!readyQueue.empty())
                 {
                     cores[cr] = readyQueue.front();
+                    for (int i = 0; i < processes.size(); i++)
+                    {
+                        if (processes[i].process_id == cores[cr].process_id && !processes[i].holder)
+                        {
+                            processes[i].holder = true;
+                            processes[i].first_runtime = currentTime;
+                            processes[i].response_time = processes[i].first_runtime - processes[i].arrival_time;
+                            break;
+                        }
+                    }
                     readyQueue.pop();
                 }
             }
-            else if (cores[cr].process_id != -1){
+            else if (cores[cr].process_id != -1)
+            {
                 cores[cr].remaining_time--;
                 cores[cr].pass += cores[cr].stride;
                 if (cores[cr].remaining_time <= 0)
                 {
+                    for (int i = 0; i < processes.size(); i++)
+                        {
+                            if (processes[i].process_id == cores[cr].process_id)
+                            {
+                                processes[i].end_time = currentTime;
+                            }
+                        }
                     cores[cr].setToZero();
-                    if(!readyQueue.empty()){
+                    if (!readyQueue.empty())
+                    {
                         cores[cr] = readyQueue.front();
+                        for (int i = 0; i < processes.size(); i++)
+                        {
+                            if (processes[i].process_id == cores[cr].process_id && !processes[i].holder)
+                            {
+                                processes[i].holder = true;
+                                processes[i].first_runtime = currentTime;
+                                processes[i].response_time = processes[i].first_runtime - processes[i].arrival_time;
+                                break;
+                            }
+                        }
                         readyQueue.pop();
                     }
                     completedProcesses++;
                 }
-            else if (cores[cr].pass > min.pass && !readyQueue.empty())
+                else if (cores[cr].pass > readyQueue.front().pass && !readyQueue.empty())
                 {
                     readyQueue.push(cores[cr]);
-                    cores[cr] = min;
+                    cores[cr] = readyQueue.front();
+                    for (int i = 0; i < processes.size(); i++)
+                    {
+                        if (processes[i].process_id == cores[cr].process_id && !processes[i].holder)
+                        {
+                            processes[i].holder = true;
+                            processes[i].first_runtime = currentTime;
+                            processes[i].response_time = processes[i].first_runtime - processes[i].arrival_time;
+                            break;
+                        }
+                    }
                     readyQueue.pop();
                 }
             }
-            else {
+            else
+            {
                 if (!readyQueue.empty())
                 {
                     cores[cr] = readyQueue.front();
+                    for (int i = 0; i < processes.size(); i++)
+                    {
+                        if (processes[i].process_id == cores[cr].process_id && !processes[i].holder)
+                        {
+                            processes[i].holder = true;
+                            processes[i].first_runtime = currentTime;
+                            processes[i].response_time = processes[i].first_runtime - processes[i].arrival_time;
+                            break;
+                        }
+                    }
                     readyQueue.pop();
                 }
             }
@@ -113,12 +162,20 @@ void Stride_Scheduler(deque<Process> processes, int numCores){
                 i--;
             }
         }
-        //printTableRow(currentTime, cores);
-        // for (int i = 0; i < numCores; i++)
-        // {
-        //     cout << cores[i].process_id << " " << cores[i].pass << endl;
-        // }
-        
+        // printTableRow(currentTime, cores);
+        //  for (int i = 0; i < numCores; i++)
+        //  {
+        //      cout << cores[i].process_id << " " << cores[i].pass << endl;
+        //  }
     }
-    //printTableRow(currentTime, cores);
+    int totalTurnTime = 0;
+    int totalResponseTime = 0;
+    for (int i = 0; i < processes.size(); i++)
+    {
+        processes[i].turnAround_time = processes[i].end_time - processes[i].arrival_time;
+        totalTurnTime += processes[i].turnAround_time;
+        totalResponseTime += processes[i].response_time;
+    }
+    cout << "Average Turnaround Time: " << totalTurnTime / processes.size() << endl;
+    cout << "Average Response Time: " << totalResponseTime / processes.size() << endl;
 }
