@@ -4,80 +4,6 @@ bool RRcompareArrivalTime(const Process &p1, const Process &p2)
 {
     return p1.arrival_time < p2.arrival_time;
 }
-// baiza
-void RR1_Scheduler(deque<Process> processes, int numCores, int quantum)
-{
-    queue<Process> readyQueue;
-    queue<Process> IOQueue;
-    int currentTime = 0;
-    int completedProcesses = 0;
-    vector<Process> cores(numCores, {-1, 0, 0, 0, 0, 0});
-    sort(processes.begin(), processes.end(), RRcompareArrivalTime);
-    printTableHeader(numCores);
-    while (completedProcesses < processes.size())
-    {
-        for (Process process : processes)
-        {
-            if (process.arrival_time == currentTime)
-            {
-                readyQueue.push(process);
-            }
-        }
-        // cout << readyQueue.size() << endl;
-        cout << currentTime << " ";
-        for (int i = 0; i < numCores; i++)
-        {
-            // cout << cores[i].process_id << endl;
-            if (cores[i].process_id == -1 && !readyQueue.empty())
-            {
-                if ((readyQueue.front().arrival_time + readyQueue.front().IO_start_time) == currentTime)
-                {
-                    IOQueue.push(readyQueue.front());
-                    // cout << "Process " << readyQueue.front().process_id << " is now in IO Queue" << endl;
-                    readyQueue.pop();
-                }
-                else
-                {
-                    // cout << "lol" << endl;
-                    cores[i] = readyQueue.front();
-                    readyQueue.pop();
-                }
-            }
-            cout << cores[i].process_id << " ";
-            if (cores[i].process_id != -1)
-            {
-                cores[i].remaining_time -= quantum;
-                cores[i].execution_time -= quantum;
-                if (cores[i].remaining_time < 0)
-                {
-                    cores[i] = {-1, 0, 0, 0, 0, 0};
-                    completedProcesses++;
-                }
-                else
-                {
-                    readyQueue.push(cores[i]);
-                    cores[i] = {-1, 0, 0, 0, 0, 0};
-                }
-            }
-        }
-        IOQueue.front().IO_time--;
-        if (IOQueue.front().IO_time == 0)
-        {
-            readyQueue.push(IOQueue.front());
-            // cout << "Process " << IOQueue.front().process_id << " is now in ready Queue" << endl;
-            IOQueue.pop();
-        }
-        // printTableRow(currentTime, cores);
-        //   cout << quantum << endl;
-        //   cout << readyQueue.size() << endl;
-        currentTime += quantum;
-        cout << endl;
-        // if (currentTime == 10)
-        // {
-        //     break;
-        // }
-    }
-}
 
 void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
 {
@@ -86,7 +12,8 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
     int completedProcesses = 0, processIdx = 0;
     vector<Process> cores(numCores, {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
     sort(processes.begin(), processes.end(), RRcompareArrivalTime);
-    for(int i = 0; i < processes.size(); i++){
+    for (int i = 0; i < processes.size(); i++)
+    {
         processes[i].time_slice = 0;
     }
     printTableHeader(numCores);
@@ -112,7 +39,7 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
             readyQueue.push(processes[processIdx]);
             processIdx++;
         }
-        printTableRow(currentTime, cores);
+
         //    execute
         for (int cr = 0; cr < numCores; cr++)
         {
@@ -120,14 +47,14 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
             {
                 IOqueue.push_back(cores[cr]);
                 cores[cr].setToZero();
-                if(!readyQueue.empty()){
+                if (!readyQueue.empty())
+                {
                     cores[cr] = readyQueue.front();
                     readyQueue.pop();
                 }
             }
             else if (cores[cr].process_id != -1) // execute
             {
-                //cout << cores[cr].time_slice << endl;
                 cores[cr].time_slice++;
                 cores[cr].remaining_time--;
                 if (cores[cr].remaining_time <= 0)
@@ -140,37 +67,18 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
                     readyQueue.push(cores[cr]);
                     cores[cr] = readyQueue.front();
                     readyQueue.pop();
-                    //cout << "Process " << readyQueue.back().process_id << " is now in ready Queue" << endl;
                 }
             }
-             else // idle core from last cycle
-             {
-                 if(!readyQueue.empty()){
+            else // idle core from last cycle
+            {
+                if (!readyQueue.empty())
+                {
                     cores[cr] = readyQueue.front();
                     readyQueue.pop();
-            //         // if (cores[cr].IO_start_time + cores[cr].arrival_time <= currentTime) // IO
-            //         // {
-            //         //     IOqueue.push_back(cores[cr]);
-            //         //     cores[cr].setToZero();
-            //         //     continue;
-            //         // }
-            //         cores[cr].time_slice++;
-            //         cores[cr].remaining_time--;
-            //         if (cores[cr].remaining_time <= 0)
-            //         {
-            //             completedProcesses++;
-            //             cores[cr].setToZero();
-            //         }
-            //         else if (cores[cr].time_slice % quantum == 0)
-            //         {
-            //             readyQueue.push(cores[cr]);
-            //             cores[cr] = readyQueue.front();
-            //             readyQueue.pop();
-            //         }
-                 }
-             }
+                }
+            }
         }
-
+        printTableRow(currentTime, cores);
         for (int i = 0; i < IOqueue.size(); i++)
         {
             IOqueue[i].IO_time--;
@@ -181,18 +89,5 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
                 i--;
             }
         }
-        // cout << "IO size: " << IOqueue.size() << endl;
-        // cout << "Ready size: " << readyQueue.size() << endl;
-        // cout << "ready front: " << readyQueue.front().process_id << endl;
-        
-        // for(int i = 0; i < readyQueue.size(); i++){
-        //     cout << readyQueue.front().process_id << endl;
-        //     readyQueue.push(readyQueue.front());
-        //     readyQueue.pop();
-        // }
-        //cout << completedProcesses << endl;
-        // cout << completedProcesses << " | IDX: " << processIdx << " | rdy: " << readyQueue.size() << " | IO: " << IOqueue.size() << " " << endl;
     }
-    printTableRow(currentTime, cores);
-    
 }
