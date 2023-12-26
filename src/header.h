@@ -38,11 +38,15 @@ typedef struct
     int turnAround_time;
     int response_time;
     int priority;
+    int stride;
+    int pass;
     char pro_specifier[MAX_LINE_LENGTH];
     int end_time;
     int time_slice;
     bool completed;
     bool holder;
+    int from_begin; // of current queue
+    int crnt_queue;
 
     void setToZero()
     {
@@ -60,6 +64,11 @@ typedef struct
         turnAround_time = 0;
         response_time = 0;
         priority = 0;
+        stride = 0;
+        pass = 0;
+        time_slice = 0;
+        from_begin = 0;
+        crnt_queue = -1;
     }
 } Process;
 
@@ -73,7 +82,9 @@ void SJF_Scheduler(deque<Process> processes, int numCores);
 void STCF_Scheduler(deque<Process> processes, int num_cores);
 void RR1_Scheduler(deque<Process> processes, int numCores, int quantum);
 void RR_Scheduler(deque<Process> processes, int numCores, int quantum);
+void Stride_Scheduler(deque<Process> processes, int numCores);
 void Priority_Scheduler(deque<Process> processes, int numCores);
+void MLFQ_Scheduler(deque<Process> processes, int numCores);
 bool compareArrival(Process &a, Process &b);
 void printTableHeader(int numCores);
 void printTableRow(int currentTime, vector<Process> &cores);
