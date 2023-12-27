@@ -92,12 +92,12 @@ void Stride_Scheduler(deque<Process> processes, int numCores)
                 if (cores[cr].remaining_time <= 0)
                 {
                     for (int i = 0; i < processes.size(); i++)
+                    {
+                        if (processes[i].process_id == cores[cr].process_id)
                         {
-                            if (processes[i].process_id == cores[cr].process_id)
-                            {
-                                processes[i].end_time = currentTime;
-                            }
+                            processes[i].end_time = currentTime;
                         }
+                    }
                     cores[cr].setToZero();
                     if (!readyQueue.empty())
                     {
@@ -162,20 +162,15 @@ void Stride_Scheduler(deque<Process> processes, int numCores)
                 i--;
             }
         }
-        // printTableRow(currentTime, cores);
-        //  for (int i = 0; i < numCores; i++)
-        //  {
-        //      cout << cores[i].process_id << " " << cores[i].pass << endl;
-        //  }
     }
-    int totalTurnTime = 0;
-    int totalResponseTime = 0;
+    double totalTurnTime = 0.0;
+    double totalResponseTime = 0.0;
     for (int i = 0; i < processes.size(); i++)
     {
         processes[i].turnAround_time = processes[i].end_time - processes[i].arrival_time;
         totalTurnTime += processes[i].turnAround_time;
         totalResponseTime += processes[i].response_time;
     }
-    cout << "Average Turnaround Time: " << totalTurnTime / processes.size() << endl;
-    cout << "Average Response Time: " << totalResponseTime / processes.size() << endl;
+    cout << "Average Turnaround Time: " << totalTurnTime / (double)processes.size() << endl;
+    cout << "Average Response Time: " << totalResponseTime / (double)processes.size() << endl;
 }

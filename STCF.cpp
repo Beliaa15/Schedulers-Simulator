@@ -36,21 +36,46 @@ void STCF_Scheduler(deque<Process> processes, int numCores)
             {
                 cores[i] = readyQueue.top();
                 readyQueue.pop();
+                for (int j = 0; j < processes.size(); j++)
+                {
+                    if (processes[j].process_id == cores[i].process_id && !processes[j].holder)
+                    {
+                        processes[j].holder = true;
+                        processes[j].first_runtime = currentTime;
+                        processes[j].response_time = processes[j].first_runtime - processes[j].arrival_time;
+                        break;
+                    }
+                }
             }
             else if (!readyQueue.empty() && cores[i].remaining_time > readyQueue.top().remaining_time)
             {
                 readyQueue.push(cores[i]);
                 cores[i] = readyQueue.top();
                 readyQueue.pop();
+                for (int j = 0; j < processes.size(); j++)
+                {
+                    if (processes[j].process_id == cores[i].process_id && !processes[j].holder)
+                    {
+                        processes[j].holder = true;
+                        processes[j].first_runtime = currentTime;
+                        processes[j].response_time = processes[j].first_runtime - processes[j].arrival_time;
+                        break;
+                    }
+                }
             }
             if (cores[i].process_id != -1)
             {
                 cores[i].remaining_time--;
                 if (cores[i].remaining_time < 0)
                 {
-                    cores[i].end_time = currentTime;
-                    // cout << "\t\t\tCore " << i + 1 << " completed Process " << cores[i].process_id << " at time " << currentTime << endl;
-                    cores[i] = {-1, 0, 0, 0, 0, 0};
+                    for (int j = 0; j < processes.size(); j++)
+                    {
+                        if (processes[j].process_id == cores[i].process_id)
+                        {
+                            processes[j].end_time = currentTime;
+                        }
+                    }
+                    cores[i].setToZero();
                     completedProcesses++;
                 }
             }
@@ -59,4 +84,15 @@ void STCF_Scheduler(deque<Process> processes, int numCores)
         currentTime++;
     }
     printTableRow(currentTime, cores);
+
+    double totalTurnTime = 0.0;
+    double totalResponseTime = 0.0;
+    for (int i = 0; i < processes.size(); i++)
+    {
+        processes[i].turnAround_time = processes[i].end_time - processes[i].arrival_time;
+        totalTurnTime += processes[i].turnAround_time;
+        totalResponseTime += processes[i].response_time;
+    }
+    cout << "Average Turnaround Time: " << totalTurnTime / (double)processes.size() << endl;
+    cout << "Average Response Time: " << totalResponseTime / (double)processes.size() << endl;
 }

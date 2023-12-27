@@ -28,6 +28,9 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
                 if (processes[processIdx].arrival_time <= currentTime)
                 {
                     cores[coreIdx] = processes[processIdx];
+                    processes[processIdx].first_runtime = currentTime;
+                    processes[processIdx].response_time = processes[processIdx].first_runtime - processes[processIdx].arrival_time;
+                    processes[processIdx].holder = true;
                     processIdx++;
                 }
             }
@@ -51,6 +54,16 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
                 {
                     cores[cr] = readyQueue.front();
                     readyQueue.pop();
+                    for (int i = 0; i < processes.size(); i++)
+                    {
+                        if (processes[i].process_id == cores[cr].process_id && !processes[i].holder)
+                        {
+                            processes[i].holder = true;
+                            processes[i].first_runtime = currentTime;
+                            processes[i].response_time = processes[i].first_runtime - processes[i].arrival_time;
+                            break;
+                        }
+                    }
                 }
             }
             else if (cores[cr].process_id != -1) // execute
@@ -60,6 +73,13 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
                 if (cores[cr].remaining_time <= 0)
                 {
                     completedProcesses++;
+                    for (int i = 0; i < processes.size(); i++)
+                    {
+                        if (processes[i].process_id == cores[cr].process_id)
+                        {
+                            processes[i].end_time = currentTime;
+                        }
+                    }
                     cores[cr].setToZero();
                 }
                 else if (cores[cr].time_slice % quantum == 0)
@@ -67,6 +87,16 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
                     readyQueue.push(cores[cr]);
                     cores[cr] = readyQueue.front();
                     readyQueue.pop();
+                    for (int i = 0; i < processes.size(); i++)
+                    {
+                        if (processes[i].process_id == cores[cr].process_id && !processes[i].holder)
+                        {
+                            processes[i].holder = true;
+                            processes[i].first_runtime = currentTime;
+                            processes[i].response_time = processes[i].first_runtime - processes[i].arrival_time;
+                            break;
+                        }
+                    }
                 }
             }
             else // idle core from last cycle
@@ -75,6 +105,16 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
                 {
                     cores[cr] = readyQueue.front();
                     readyQueue.pop();
+                    for (int i = 0; i < processes.size(); i++)
+                    {
+                        if (processes[i].process_id == cores[cr].process_id && !processes[i].holder)
+                        {
+                            processes[i].holder = true;
+                            processes[i].first_runtime = currentTime;
+                            processes[i].response_time = processes[i].first_runtime - processes[i].arrival_time;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -90,4 +130,14 @@ void RR_Scheduler(deque<Process> processes, int numCores, int quantum)
             }
         }
     }
+    double totalTurnTime = 0.0;
+    double totalResponseTime = 0.0;
+    for (int i = 0; i < processes.size(); i++)
+    {
+        processes[i].turnAround_time = processes[i].end_time - processes[i].arrival_time;
+        totalTurnTime += processes[i].turnAround_time;
+        totalResponseTime += processes[i].response_time;
+    }
+    cout << "Average Turnaround Time: " << totalTurnTime / (double)processes.size() << endl;
+    cout << "Average Response Time: " << totalResponseTime / (double)processes.size() << endl;
 }
